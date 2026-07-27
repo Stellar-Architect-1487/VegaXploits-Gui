@@ -6,7 +6,7 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local TS = game:GetService("TweenService")
 
--- Глобальные настройки
+-- Глобальные настройки состояний
 if not getgenv().Hacks then
     getgenv().Hacks = {Speed = false, Fly = false, Noclip = false, ESP = false, InfJump = false, ClickKill = false, RainbowUI = false}
 end
@@ -35,7 +35,7 @@ Main.ClipsDescendants = true
 local mainCorner = Instance.new("UICorner", Main)
 mainCorner.CornerRadius = UDim.new(0, 8)
 
--- Плавное перетаскивание (Drag) без лагов
+-- Плавное перетаскивание (Drag) без лагов мыши
 local dragging, dragInput, dragStart, startPos
 local function update(input)
     local delta = input.Position - dragStart
@@ -78,7 +78,7 @@ Title.Font = Enum.Font.Code
 Title.TextSize = 12
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Кнопка закрытия
+-- Кнопка закрытия хаба
 local Close = Instance.new("TextButton", TitleBar)
 Close.Size = UDim2.new(0, 35, 0, 35)
 Close.Position = UDim2.new(1, -40, 0, 2)
@@ -234,7 +234,6 @@ local function printToUI(message, isError)
 end
 
 LogService.MessageOut:Connect(function(m, t) printToUI(m, t == Enum.MessageType.MessageError) end)
-
 -- ================= КАТЕГОРИЯ 1: MOVEMENT =================
 addBtn(CAT1, "SPEED: OFF", 0, function(b) toggler("Speed", b, "SPEED") end)
 addBtn(CAT1, "FLY: OFF", 1, function(b)
@@ -327,11 +326,25 @@ addBtn(CAT4, "SCAN ALL USERS", 3, function() for _, p in ipairs(Plrs:GetPlayers(
 addBtn(CAT4, "GET CORRDINATS", 4, function() local t = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") if t then printToUI("Координаты: " .. tostring(t.Position)) end end)
 addBtn(CAT4, "GRAVITY TO 0", 5, function() workspace.Gravity = 0 printToUI("Гравитация отключена") end)
 addBtn(CAT4, "GRAVITY NORMAL", 6, function() workspace.Gravity = 196.2 printToUI("Гравитация восстановлена") end)
-addBtn(CAT4, "JUMP POWER RST", 7, function() local h = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") if h then h.JumpPower = 50 printToUI("Прыжок сброшен") end end)
+addBtn(CAT4, "JUMP POWER RST", 7, function() local h = LP.Character and LP.Character:FindFirstClass("Humanoid") if h then h.JumpPower = 50 printToUI("Прыжок сброшен") end end)
 addBtn(CAT4, "FORCE EXIT GM", 8, function() game:Shutdown() end)
 addBtn(CAT4, "UNLOCK CON F9", 9, function() game:GetService("GuiService"):SetDeveloperGuiEnabled(true) printToUI("Консоль F9 разблокирована") end)
-addBtn(CAT4, "INFINITE YIELD", 10, function() loadstring(game:HttpGet("https://githubusercontent.com"))() printToUI("Infinite Yield запущен") end)
-addBtn(CAT4, "DARK DEX V3", 11, function() loadstring(game:HttpGet("https://githubusercontent.com"))() printToUI("Dark Dex запущен") end)
+
+-- Исправленная кнопка Infinite Yield
+addBtn(CAT4, "INFINITE YIELD", 10, function() 
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://githubusercontent.com"))() 
+    end)
+    if success then printToUI("Infinite Yield запущен") else printToUI("Ошибка IY: " .. tostring(err), true) end
+end)
+
+-- Исправленная кнопка Dark Dex V3
+addBtn(CAT4, "DARK DEX V3", 11, function() 
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://githubusercontent.com"))() 
+    end)
+    if success then printToUI("Dark Dex Bypassed запущен") else printToUI("Ошибка Dex: " .. tostring(err), true) end
+end)
 
 -- Единый сверхстабильный цикл обслуживания (Защита от фризов и лагов)
 RS.Heartbeat:Connect(function()
